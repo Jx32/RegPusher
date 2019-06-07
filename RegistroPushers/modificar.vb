@@ -16,11 +16,33 @@ Public Class modificar
     End Sub
 
     Private Sub modificar_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-        DataGridView1.Size = New Size(Me.Width, Me.Height * 0.9)
-        DataGridView1.Location = New Point(0, Me.Height * 0.1)
+        'DataGridView1.Size = New Size(Me.Width, Me.Height * 0.9)
+        'DataGridView1.Location = New Point(0, Me.Height * 0.1)
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Public Sub releaseObject(ByVal obj As Object)
+        Try
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(obj)
+            obj = Nothing
+        Catch ex As Exception
+            obj = Nothing
+        Finally
+            GC.Collect()
+        End Try
+    End Sub
+
+    Private Sub closeXls()
+        Try
+            WB.saved = True
+            WB.close()
+            xlsApp.quit()
+            releaseObject(xlsApp)
+            releaseObject(WB)
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    Private Sub ToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem2.Click
         If SaveFileDialog1.ShowDialog() = DialogResult.OK Then
             Dim f As String = SaveFileDialog1.FileName
 
@@ -66,27 +88,5 @@ Public Class modificar
 
             MsgBox("Archivo exportado con exito!", MsgBoxStyle.Information, "Registro de Pushers")
         End If
-    End Sub
-
-    Public Sub releaseObject(ByVal obj As Object)
-        Try
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(obj)
-            obj = Nothing
-        Catch ex As Exception
-            obj = Nothing
-        Finally
-            GC.Collect()
-        End Try
-    End Sub
-
-    Private Sub closeXls()
-        Try
-            WB.saved = True
-            WB.close()
-            xlsApp.quit()
-            releaseObject(xlsApp)
-            releaseObject(WB)
-        Catch ex As Exception
-        End Try
     End Sub
 End Class
